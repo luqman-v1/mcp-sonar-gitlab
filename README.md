@@ -48,16 +48,55 @@ go build -o ~/go/bin/mcp-sonar-gitlab .
 
 ## 🔑 Environment Variables
 
-Each team member configures their own tokens in their local MCP settings:
+Setiap anggota tim mengatur token dan konfigurasinya sendiri di file setting MCP lokal mereka.
 
-| Variable | Required | Default | Description |
+| Variable | Status | Default | Deskripsi |
 |---|---|---|---|
-| `SONAR_TOKEN` | **Yes** | - | Your personal SonarQube / SonarCloud token |
-| `SONAR_HOST_URL` | No | `https://sonarcloud.io` | Sonar URL (e.g. `https://sonar.internal.company.com`) |
-| `SONAR_ORGANIZATION` | No | - | SonarCloud organization key (if applicable) |
-| `GITLAB_TOKEN` | No | - | GitLab personal access token (used to read `sonar-project.properties`) |
-| `GITLAB_BASE_URL` | No | Inferred from MR | GitLab instance base URL (e.g. `https://gitlab.com` or self-hosted) |
-| `NAMESPACE_PREFIX_MAP` | No | - | Custom namespace prefix mapping (e.g. `myorg/backend/=org/be/`) |
+| `SONAR_TOKEN` | **Required** | - | Token pribadi SonarQube / SonarCloud kamu. |
+| `SONAR_HOST_URL` | *Optional* | `https://sonarcloud.io` | URL instance Sonar. Wajib diisi jika menggunakan SonarQube on-premise internal kantor (contoh: `https://sonar.internal.company.com`). |
+| `GITLAB_TOKEN` | *Optional* | - | Personal Access Token GitLab dengan scope `read_api` atau `read_repository`. Digunakan untuk membaca file `sonar-project.properties` langsung dari repo. Jika dikosongkan, resolver akan menggunakan `NAMESPACE_PREFIX_MAP`. |
+| `NAMESPACE_PREFIX_MAP` | *Optional* | - | Pemetaan prefix path namespace GitLab ke Sonar component key (format: `prefix_lama/=prefix_baru/`, bisa pisahkan dengan koma). Sangat berguna sebagai fallback jika repo tidak memiliki `sonar-project.properties`. |
+| `GITLAB_BASE_URL` | *Optional* | Inferred dari MR URL | Base URL instance GitLab. Secara default otomatis diekstrak langsung dari domain MR URL yang kamu berikan. |
+| `SONAR_ORGANIZATION` | *Optional* | - | Organization key pada SonarCloud (hanya diperlukan jika akun SonarCloud kamu memerlukan parameter organization). |
+
+### Detail Cara Kerja Setiap Variabel:
+
+1. **`SONAR_TOKEN` (Wajib)**:
+   - Dibutuhkan untuk otentikasi API Sonar.
+   - Mendukung SonarCloud (Bearer token) maupun SonarQube on-premise (otomatis fallback ke Basic Auth `token:` jika server menolak Bearer).
+2. **`SONAR_HOST_URL` (Opsional)**:
+   - Jika tidak diisi, otomatis menggunakan `https://sonarcloud.io`.
+   - Isi dengan domain SonarQube kantor kamu jika bukan cloud publik.
+3. **`GITLAB_TOKEN` (Opsional)**:
+   - Jika diisi, tool akan memanggil GitLab API untuk mengecek apakah ada file `sonar-project.properties` di root repository. Jika properti `sonar.projectKey=...` ditemukan, key tersebut yang akan dipakai untuk query Sonar.
+   - Jika tidak diisi atau file properties tidak ada, tool langsung lanjut ke langkah mapping path.
+4. **`NAMESPACE_PREFIX_MAP` (Opsional)**:
+   - Digunakan untuk mentranslasi struktur path repo menjadi component key Sonar.
+   - Format: `source_path/=target_prefix/` (contoh: `mygroup/project/backend/=sb/be/`).
+   - Setelah prefix diganti, seluruh karakter slash (`/`) otomatis dikonversi menjadi colon (`:`).
+5. **`GITLAB_BASE_URL` (Opsional)**:
+   - Tidak perlu diisi jika MR URL yang kamu masukkan adalah URL lengkap (misal `https://gitlab.mycorp.com/...`), karena host akan langsung terdeteksi.
+
+---
+
+### 📋 Contoh Konfigurasi
+
+#### Opsi 1: Setup Lengkap (Direkomendasikan untuk Tim)
+```json
+"env": {
+  "SONAR_TOKEN": "sqp_your_personal_token",
+  "SONAR_HOST_URL": "https://sonarcloud.io",
+  "GITLAB_TOKEN": "glpat_your_gitlab_token",
+  "NAMESPACE_PREFIX_MAP": "mygroup/project/backend/=sb/be/"
+}
+```
+
+#### Opsi 2: Setup Minimal (Hanya SonarCloud)
+```json
+"env": {
+  "SONAR_TOKEN": "sqp_your_personal_token"
+}
+```
 
 ---
 
