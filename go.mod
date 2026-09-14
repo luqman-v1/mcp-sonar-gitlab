@@ -1,6 +1,6 @@
-module github.com/luqman-v1/mcp-sonar-gitlab-
+module github.com/luqman-v1/mcp-sonar-gitlab
 
-go 1.26.5
+go 1.27
 
 require github.com/mark3labs/mcp-go v1.0.0
 

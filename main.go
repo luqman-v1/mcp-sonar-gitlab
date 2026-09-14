@@ -11,9 +11,9 @@ import (
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 
-	"github.com/luqman-v1/mcp-sonar-gitlab-/pkg/gitlab"
-	"github.com/luqman-v1/mcp-sonar-gitlab-/pkg/resolver"
-	"github.com/luqman-v1/mcp-sonar-gitlab-/pkg/sonar"
+	"github.com/luqman-v1/mcp-sonar-gitlab/pkg/gitlab"
+	"github.com/luqman-v1/mcp-sonar-gitlab/pkg/resolver"
+	"github.com/luqman-v1/mcp-sonar-gitlab/pkg/sonar"
 )
 
 var (

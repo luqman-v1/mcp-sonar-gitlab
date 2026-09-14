@@ -3,7 +3,7 @@ package gitlab_test
 import (
 	"testing"
 
-	"github.com/luqman-v1/mcp-sonar-gitlab-/pkg/gitlab"
+	"github.com/luqman-v1/mcp-sonar-gitlab/pkg/gitlab"
 )
 
 func TestParseMRURL(t *testing.T) {

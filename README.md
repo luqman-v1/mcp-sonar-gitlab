@@ -1,6 +1,6 @@
-# mcp-sonar-gitlab-
+# mcp-sonar-gitlab
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/luqman-v1/mcp-sonar-gitlab-)](https://goreportcard.com/report/github.com/luqman-v1/mcp-sonar-gitlab-)
+[![Go Report Card](https://goreportcard.com/badge/github.com/luqman-v1/mcp-sonar-gitlab)](https://goreportcard.com/report/github.com/luqman-v1/mcp-sonar-gitlab)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Model Context Protocol (MCP) server written in Go for fetching SonarQube / SonarCloud issues and quality gates directly from GitLab Merge Request URLs.
@@ -23,25 +23,25 @@ Designed for engineering teams to use locally with AI coding assistants (Cursor,
 
 ### 1. Install via `go install` (Recommended)
 
-Make sure Go is installed and `$GOPATH/bin` (or `~/go/bin`) is in your system's `PATH`:
+Requires Go 1.27+ installed. Make sure `$GOPATH/bin` (or `~/go/bin`) is in your system's `PATH`:
 
 ```bash
-go install github.com/luqman-v1/mcp-sonar-gitlab-@latest
+go install github.com/luqman-v1/mcp-sonar-gitlab@latest
 ```
 
 Verify the installation:
 
 ```bash
-mcp-sonar-gitlab- --version
+mcp-sonar-gitlab --version
 # Output: mcp-sonar-gitlab v1.0.0
 ```
 
 *(Optional) Alternatively, build from source:*
 
 ```bash
-git clone git@github.com:luqman-v1/mcp-sonar-gitlab-.git
-cd mcp-sonar-gitlab-
-go build -o ~/go/bin/mcp-sonar-gitlab- .
+git clone git@github.com:luqman-v1/mcp-sonar-gitlab.git
+cd mcp-sonar-gitlab
+go build -o ~/go/bin/mcp-sonar-gitlab .
 ```
 
 ---
@@ -71,7 +71,7 @@ Add to `~/.cursor/mcp.json` (or via **Settings > Features > MCP Servers**):
 {
   "mcpServers": {
     "sonar-gitlab": {
-      "command": "mcp-sonar-gitlab-",
+      "command": "mcp-sonar-gitlab",
       "env": {
         "SONAR_TOKEN": "sqp_your_personal_sonar_token",
         "SONAR_HOST_URL": "https://sonarcloud.io",
@@ -83,7 +83,7 @@ Add to `~/.cursor/mcp.json` (or via **Settings > Features > MCP Servers**):
 }
 ```
 
-*Tip:* If `mcp-sonar-gitlab-` is not in your global PATH, provide the absolute path: `"/Users/yourname/go/bin/mcp-sonar-gitlab-"`.
+*Tip:* If `mcp-sonar-gitlab` is not in your global PATH, provide the absolute path: `"/Users/yourname/go/bin/mcp-sonar-gitlab"`.
 
 ---
 
@@ -97,7 +97,7 @@ Add to your Claude configuration file:
 {
   "mcpServers": {
     "sonar-gitlab": {
-      "command": "mcp-sonar-gitlab-",
+      "command": "mcp-sonar-gitlab",
       "env": {
         "SONAR_TOKEN": "sqp_your_personal_sonar_token",
         "SONAR_HOST_URL": "https://sonarcloud.io",
@@ -119,7 +119,7 @@ Add to your `~/.codeium/windsurf/mcp_config.json`:
 {
   "mcpServers": {
     "sonar-gitlab": {
-      "command": "mcp-sonar-gitlab-",
+      "command": "mcp-sonar-gitlab",
       "env": {
         "SONAR_TOKEN": "sqp_your_personal_sonar_token",
         "SONAR_HOST_URL": "https://sonarcloud.io",
@@ -141,7 +141,7 @@ Add to your `~/.gemini/config/mcp_config.json`:
 {
   "mcpServers": {
     "sonar-gitlab": {
-      "command": "mcp-sonar-gitlab-",
+      "command": "mcp-sonar-gitlab",
       "env": {
         "SONAR_TOKEN": "sqp_your_personal_sonar_token",
         "SONAR_HOST_URL": "https://sonarcloud.io",

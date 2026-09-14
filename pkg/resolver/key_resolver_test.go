@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/luqman-v1/mcp-sonar-gitlab-/pkg/resolver"
+	"github.com/luqman-v1/mcp-sonar-gitlab/pkg/resolver"
 )
 
 func TestMapPathToComponentKey(t *testing.T) {

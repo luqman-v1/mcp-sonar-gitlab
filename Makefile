@@ -1,6 +1,6 @@
 .PHONY: build test check install clean
 
-BINARY_NAME=mcp-sonar-gitlab-
+BINARY_NAME=mcp-sonar-gitlab
 
 build:
 	go build -o bin/$(BINARY_NAME) .

@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/luqman-v1/mcp-sonar-gitlab-/pkg/sonar"
+	"github.com/luqman-v1/mcp-sonar-gitlab/pkg/sonar"
 )
 
 func TestSonarClient_GetMRIssues_BearerAuth(t *testing.T) {

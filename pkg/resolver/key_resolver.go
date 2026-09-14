@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/luqman-v1/mcp-sonar-gitlab-/pkg/gitlab"
+	"github.com/luqman-v1/mcp-sonar-gitlab/pkg/gitlab"
 )
 
 // ResolveComponentKey resolves the Sonar component key from GitLab repository properties or namespace path.
