@@ -11,7 +11,7 @@ Designed for engineering teams to use locally with AI coding assistants (Cursor,
 
 ## ⚡ Key Features
 
-- **Standard `stdio` MCP Server:** Runs directly inside your AI IDE without requiring a long-running background web server or port binding.
+- **Standard `stdio` MCP Server:** Runs directly inside your AI IDE without requiring a background daemon or port binding.
 - **GitLab MR to Sonar Mapping:** Automatically parses GitLab MR URLs, resolves project component keys, and queries SonarQube / SonarCloud.
 - **Dual Auth Support:** Transparently supports SonarCloud (`Bearer` token) and on-premise SonarQube (auto-fallback to HTTP Basic Auth).
 - **Flexible Namespace Mapping:** Supports custom path prefix mapping via `NAMESPACE_PREFIX_MAP` or automatically reads `sonar.projectKey` from `sonar-project.properties`.
@@ -23,7 +23,7 @@ Designed for engineering teams to use locally with AI coding assistants (Cursor,
 
 ### 1. Install via `go install` (Recommended)
 
-Requires Go 1.27+ installed. Make sure `$GOPATH/bin` (or `~/go/bin`) is in your system's `PATH`:
+Requires Go 1.27+. Make sure `$GOPATH/bin` (or `~/go/bin`) is in your system's `PATH`:
 
 ```bash
 go install github.com/luqman-v1/mcp-sonar-gitlab@latest
@@ -48,53 +48,53 @@ go build -o ~/go/bin/mcp-sonar-gitlab .
 
 ## 🔑 Environment Variables
 
-Setiap anggota tim mengatur token dan konfigurasinya sendiri di file setting MCP lokal mereka.
+Each team member configures their own credentials and preferences in their local MCP settings:
 
-| Variable | Status | Default | Deskripsi |
+| Variable | Status | Default | Description |
 |---|---|---|---|
-| `SONAR_TOKEN` | **Required** | - | Token pribadi SonarQube / SonarCloud kamu. |
-| `SONAR_HOST_URL` | *Optional* | `https://sonarcloud.io` | URL instance Sonar. Wajib diisi jika menggunakan SonarQube on-premise internal kantor (contoh: `https://sonar.internal.company.com`). |
-| `GITLAB_TOKEN` | *Optional* | - | Personal Access Token GitLab dengan scope `read_api` atau `read_repository`. Digunakan untuk membaca file `sonar-project.properties` langsung dari repo. Jika dikosongkan, resolver akan menggunakan `NAMESPACE_PREFIX_MAP`. |
-| `NAMESPACE_PREFIX_MAP` | *Optional* | - | Pemetaan prefix path namespace GitLab ke Sonar component key (format: `prefix_lama/=prefix_baru/`, bisa pisahkan dengan koma). Sangat berguna sebagai fallback jika repo tidak memiliki `sonar-project.properties`. |
-| `GITLAB_BASE_URL` | *Optional* | Inferred dari MR URL | Base URL instance GitLab. Secara default otomatis diekstrak langsung dari domain MR URL yang kamu berikan. |
-| `SONAR_ORGANIZATION` | *Optional* | - | Organization key pada SonarCloud (hanya diperlukan jika akun SonarCloud kamu memerlukan parameter organization). |
+| `SONAR_TOKEN` | **Required** | - | Your personal SonarQube / SonarCloud access token. |
+| `SONAR_HOST_URL` | *Optional* | `https://sonarcloud.io` | Sonar instance URL. Required if using an internal on-premise SonarQube instance (e.g. `https://sonar.internal.company.com`). |
+| `GITLAB_TOKEN` | *Optional* | - | GitLab Personal Access Token with `read_api` or `read_repository` scope. Used to read `sonar-project.properties` directly from the repository. If omitted, the resolver falls back to `NAMESPACE_PREFIX_MAP`. |
+| `NAMESPACE_PREFIX_MAP` | *Optional* | - | Mapping rule from GitLab namespace path to Sonar component key (format: `old_prefix/=new_prefix/`, comma-separated for multiple mappings). Useful when repos lack `sonar-project.properties`. |
+| `GITLAB_BASE_URL` | *Optional* | Inferred from MR URL | GitLab instance base URL. Automatically detected from the host of the provided MR URL. |
+| `SONAR_ORGANIZATION` | *Optional* | - | SonarCloud organization key (only needed if your SonarCloud account requires an organization parameter). |
 
-### Detail Cara Kerja Setiap Variabel:
+### Variable Behavior & Fallbacks:
 
-1. **`SONAR_TOKEN` (Wajib)**:
-   - Dibutuhkan untuk otentikasi API Sonar.
-   - Mendukung SonarCloud (Bearer token) maupun SonarQube on-premise (otomatis fallback ke Basic Auth `token:` jika server menolak Bearer).
-2. **`SONAR_HOST_URL` (Opsional)**:
-   - Jika tidak diisi, otomatis menggunakan `https://sonarcloud.io`.
-   - Isi dengan domain SonarQube kantor kamu jika bukan cloud publik.
-3. **`GITLAB_TOKEN` (Opsional)**:
-   - Jika diisi, tool akan memanggil GitLab API untuk mengecek apakah ada file `sonar-project.properties` di root repository. Jika properti `sonar.projectKey=...` ditemukan, key tersebut yang akan dipakai untuk query Sonar.
-   - Jika tidak diisi atau file properties tidak ada, tool langsung lanjut ke langkah mapping path.
-4. **`NAMESPACE_PREFIX_MAP` (Opsional)**:
-   - Digunakan untuk mentranslasi struktur path repo menjadi component key Sonar.
-   - Format: `source_path/=target_prefix/` (contoh: `mygroup/project/backend/=sb/be/`).
-   - Setelah prefix diganti, seluruh karakter slash (`/`) otomatis dikonversi menjadi colon (`:`).
-5. **`GITLAB_BASE_URL` (Opsional)**:
-   - Tidak perlu diisi jika MR URL yang kamu masukkan adalah URL lengkap (misal `https://gitlab.mycorp.com/...`), karena host akan langsung terdeteksi.
+1. **`SONAR_TOKEN` (Required)**:
+   - Required for Sonar API authentication.
+   - Works with both SonarCloud (Bearer token) and SonarQube on-premise (automatically falls back to Basic Auth `<token>:` if Bearer is rejected with `401 Unauthorized`).
+2. **`SONAR_HOST_URL` (Optional)**:
+   - Defaults to `https://sonarcloud.io`.
+   - Set to your private/corporate SonarQube domain if not using public SonarCloud.
+3. **`GITLAB_TOKEN` (Optional)**:
+   - When provided, queries the GitLab API to check if `sonar-project.properties` exists in the repository root. If `sonar.projectKey=...` is found, that key is prioritized.
+   - If omitted or properties file is not found, resolution proceeds directly to path mapping.
+4. **`NAMESPACE_PREFIX_MAP` (Optional)**:
+   - Translates repo path prefixes into Sonar component key format.
+   - Format: `source_path/=target_prefix/` (e.g. `mygroup/project/backend/=org/be/`).
+   - Slashes (`/`) are automatically normalized to colons (`:`).
+5. **`GITLAB_BASE_URL` (Optional)**:
+   - Not needed if the MR URL is a full URL (e.g. `https://gitlab.mycorp.com/...`), as the host is automatically parsed.
 
 ---
 
-### 📋 Contoh Konfigurasi
+### 📋 Configuration Examples
 
-#### Opsi 1: Setup Lengkap (Direkomendasikan untuk Tim)
+#### Option 1: Recommended Team Setup
 ```json
 "env": {
-  "SONAR_TOKEN": "sqp_your_personal_token",
+  "SONAR_TOKEN": "sqp_your_personal_sonar_token",
   "SONAR_HOST_URL": "https://sonarcloud.io",
-  "GITLAB_TOKEN": "glpat_your_gitlab_token",
-  "NAMESPACE_PREFIX_MAP": "mygroup/project/backend/=sb/be/"
+  "GITLAB_TOKEN": "glpat_your_personal_gitlab_token",
+  "NAMESPACE_PREFIX_MAP": "mygroup/project/backend/=org/be/"
 }
 ```
 
-#### Opsi 2: Setup Minimal (Hanya SonarCloud)
+#### Option 2: Minimal Setup (SonarCloud only)
 ```json
 "env": {
-  "SONAR_TOKEN": "sqp_your_personal_token"
+  "SONAR_TOKEN": "sqp_your_personal_sonar_token"
 }
 ```
 
@@ -200,11 +200,11 @@ Once registered, your AI assistant will automatically discover the `fetch_sonar_
 
 Example prompts in your IDE:
 
-> *"Cek sonar issue untuk MR ini: https://gitlab.com/mygroup/backend/order-service/-/merge_requests/45"*
+> *"Check Sonar issues for this MR: https://gitlab.com/mygroup/backend/order-service/-/merge_requests/45"*
 
 > *"Fetch all blocker and critical Sonar issues for MR https://gitlab.com/.../-/merge_requests/12 and suggest code fixes."*
 
-> *"Periksa apakah Quality Gate lolos untuk MR ini sebelum kita merge."*
+> *"Has this MR passed the Quality Gate? List all failing conditions if any."*
 
 ---
 
